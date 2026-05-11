@@ -1,0 +1,12 @@
+replicaCount: 3
+persistence:
+  size: 10Gi
+hpa:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+serviceMonitor:
+  enabled: true
+networkPolicy:
+  enabled: true
