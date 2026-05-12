@@ -30,8 +30,8 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 # Permissions and non-root user
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
-    && mkdir -p /var/lib/nginx /var/tmp/nginx /var/log/nginx /var/log/supervisor /run \
-    && chown -R www-data:www-data /var/lib/nginx /var/log/nginx /var/log/supervisor /run
+    && mkdir -p /var/www/html/database /var/lib/nginx /var/tmp/nginx /var/log/nginx /var/log/supervisor /run \
+    && chown -R www-data:www-data /var/www/html/database /var/lib/nginx /var/log/nginx /var/log/supervisor /run
 
 # Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
