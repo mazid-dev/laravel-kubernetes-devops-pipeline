@@ -5,17 +5,12 @@ echo "Caching configuration and routes..."
 php artisan config:cache
 php artisan route:cache
 
-# view:cache শুধুমাত্র তখনই চালাবো যদি resources/views ফোল্ডার থাকে
-if [ -d "/var/www/html/resources/views" ]; then
-    echo "resources/views found, caching views..."
-    php artisan view:cache
-else
-    echo "resources/views not found, skipping view:cache"
-fi
+# view:cache temporarily disabled – causes error in current environment
+# php artisan view:cache
 
 if [ ! -f "/var/www/html/database/database.sqlite" ]; then
     touch /var/www/html/database/database.sqlite
 fi
 
 echo "Starting Supervisor..."
-exec /usr/bin/supervisord -c /etc/supervisord.conf
+exec /usr/sbin/supervisord -c /etc/supervisord.conf
