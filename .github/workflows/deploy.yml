@@ -14,11 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -27,22 +29,36 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
             ${{ env.DOCKER_IMAGE }}:latest
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup kubeconfig
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_PROD }}" > $HOME/.kube/config
+
       - name: Install Helm
         uses: azure/setup-helm@v3
+
+      - name: Cleanup old resources
+        run: |
+          kubectl delete deployment laravel-app -n ${{ env.KUBE_NAMESPACE }} --ignore-not-found || true
+          kubectl delete pvc laravel-app-pvc -n ${{ env.KUBE_NAMESPACE }} --ignore-not-found || true
+          kubectl delete pods --all -n ${{ env.KUBE_NAMESPACE }} --ignore-not-found || true
+
       - name: Deploy with Helm
         run: |
           helm upgrade --install laravel-app ${{ env.HELM_CHART_PATH }} \
             --namespace ${{ env.KUBE_NAMESPACE }} \
             --create-namespace \
+            --set persistence.enabled=false \
+            --set configmap.APP_DEBUG=true \
+            --set configmap.DB_CONNECTION=sqlite \
+            --set configmap.DB_DATABASE=/var/www/html/database/database.sqlite \
             --set image.repository=${{ env.DOCKER_IMAGE }} \
             --set image.tag=${{ github.sha }} \
             --wait --timeout 10m

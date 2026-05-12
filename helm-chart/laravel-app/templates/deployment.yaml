@@ -1,83 +1,75 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Values.namespace }}
-
 spec:
   replicas: {{ .Values.replicaCount }}
-
   selector:
     matchLabels:
       app: {{ .Release.Name }}
-
   template:
     metadata:
       labels:
         app: {{ .Release.Name }}
-
     spec:
       securityContext:
-        fsGroup: 1000
+        fsGroup: 82
 
-      {{- if .Values.persistence.enabled }}
       initContainers:
         - name: fix-permissions
           image: busybox:latest
           command:
             - sh
             - -c
-            - chown -R 1000:1000 /var/www/html/storage /var/www/html/bootstrap/cache
-
+            - chown -R 82:82 /var/www/html/storage /var/www/html/bootstrap/cache
           volumeMounts:
             - name: storage-volume
               mountPath: /var/www/html/storage
-      {{- end }}
+            - name: cache-volume
+              mountPath: /var/www/html/bootstrap/cache
 
       containers:
         - name: laravel
-
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-
           ports:
             - containerPort: 8080
               name: http
-
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-config
-
             - secretRef:
                 name: {{ .Release.Name }}-secret
-
-          {{- if .Values.persistence.enabled }}
+          
           volumeMounts:
             - name: storage-volume
               mountPath: /var/www/html/storage
-          {{- end }}
+            - name: cache-volume
+              mountPath: /var/www/html/bootstrap/cache
 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
+          # ডিবাগ করার জন্য প্রোবগুলো কমেন্ট করা থাকলো
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 60
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 30
 
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
-
-      {{- if .Values.persistence.enabled }}
       volumes:
         - name: storage-volume
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-pvc
-      {{- end }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: cache-volume
+          emptyDir: {}
