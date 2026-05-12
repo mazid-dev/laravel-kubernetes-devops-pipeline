@@ -19,6 +19,9 @@ RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite gd zip opcache
 COPY --from=builder /app/vendor ./vendor
 COPY . .
 
+# Create required directories if missing (especially important for view caching)
+RUN mkdir -p /var/www/html/resources/views
+
 # Config files
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
