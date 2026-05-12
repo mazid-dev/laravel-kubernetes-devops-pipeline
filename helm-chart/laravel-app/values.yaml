@@ -22,9 +22,10 @@ persistence:
 
 configmap:
   APP_ENV: production
-  APP_DEBUG: "true"         
-  DB_CONNECTION: sqlite     
-  DB_DATABASE: ":memory:"
+  APP_DEBUG: "true"
+  SESSION_DRIVER: file
+  DB_CONNECTION: sqlite
+  DB_DATABASE: /var/www/html/database/database.sqlite
 
 secret:
   APP_KEY: "base64:hqMOKFjImmrWIPDOBjpt0AU8mAS4zJIJ7aPfYTGHVkM="
