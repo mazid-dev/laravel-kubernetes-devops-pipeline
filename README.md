@@ -1,59 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+`# 🚀 Laravel on Kubernetes (kubeadm + Docker + Helm + GitHub Actions)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A production-style end-to-end DevOps project demonstrating deployment of a Laravel 11 application on a self-managed Kubernetes cluster using Docker, Helm, and GitHub Actions CI/CD pipeline.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Project Overview
+This project demonstrates how a Laravel application can be containerized and deployed on a Kubernetes cluster built using **kubeadm** on **AWS EC2**. The deployment is fully automated using **GitHub Actions CI/CD pipeline** and managed through **Helm charts** with Ingress-based external access.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The system is designed as a real-world DevOps workflow including build, push, deploy, monitoring, and troubleshooting.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏗️ Architecture
+```text
+Developer → GitHub → GitHub Actions CI
+                         ↓
+                 Docker Image Build
+                         ↓
+                    Docker Hub
+                         ↓
+                 GitHub Actions CD
+                         ↓
+                 Helm Deployment
+                         ↓
+              Kubernetes Cluster (kubeadm)
+                         ↓
+        ┌────────────────────────────┐
+        │ Laravel App (PHP + Nginx)  │
+        │ Ingress Controller         │
+        └────────────────────────────┘
+                         ↓
+                 NodePort (30850)
+                         ↓
+                     Browser User`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ⚙️ Tech Stack
 
-## Laravel Sponsors
+| **Layer** | **Technology** |
+| --- | --- |
+| **Application** | Laravel 11 (PHP 8.2-FPM, Nginx) |
+| **Containerization** | Docker (Multi-stage build) |
+| **Orchestration** | Kubernetes (kubeadm v1.30) |
+| **Package Manager** | Helm |
+| **CI/CD** | GitHub Actions |
+| **Cloud** | AWS EC2 (Ubuntu 22.04) |
+| **Networking** | Calico CNI, Nginx Ingress |
+| **Registry** | Docker Hub |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🚀 Key Features
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- ✅ Fully containerized Laravel application
+- ✅ Production-like Kubernetes cluster setup (1 master + 2 workers)
+- ✅ Automated CI/CD pipeline with GitHub Actions
+- ✅ Helm-based deployment management
+- ✅ Ingress controller for external traffic routing
+- ✅ Health check endpoint (`/health`)
+- ✅ Scalable and modular architecture
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧱 Project Setup Flow
 
-## Code of Conduct
+1. Laravel application setup
+2. Docker image creation (multi-stage build)
+3. Push image to Docker Hub
+4. Kubernetes cluster setup using kubeadm
+5. Install Calico CNI & Nginx Ingress Controller
+6. Create Helm chart (Deployment, Service, Ingress, ConfigMap)
+7. Configure GitHub Actions CI/CD pipeline
+8. Deploy application automatically via Helm upgrade
+9. Access application via NodePort + Ingress
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🐞 Key Issues & Solutions
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| **Issue** | **Cause** | **Solution** |
+| --- | --- | --- |
+| **Nodes NotReady** | Missing CNI | Installed Calico |
+| **Worker Not Joining** | swap enabled | Disabled swap |
+| **Ingress error** | webhook issue | Removed invalid webhook config |
+| **PVC Pending** | No StorageClass | Disabled persistence |
+| **Laravel 500 error** | session DB issue | Set `SESSION_DRIVER=file` |
+| **Supervisord error** | wrong path | Fixed executable path |
+| **Connection refused** | Security group issue | Opened NodePort 30850 |
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ✅ Final Result
+
+- **Pods Status:** Running (1/1)
+- **Health Check:** `{"status":"ok"}`
+- **Browser Access:** `http://laravel-test.local:30850`
+- **CI/CD:** Fully automated deployment on every push
+
+---
+
+## 📸 Screenshots
+
+#### 1. Kubernetes Cluster Status (Nodes Ready)
+![Cluster Status](./screenshots/nodes_ready.png)
+
+#### 2. Kubernetes Pods Status
+![Pod Status](./screenshots/pod_status.png)
+
+#### 3. Web Browser Access
+![Browser Output](./screenshots/browser_output.png)
+
+#### 4. GitHub Actions Pipeline Success
+![GitHub Actions](./screenshots/pipeline_success.png)
+
+
+## 🧠 What I Learned
+
+- Docker multi-stage production builds
+- Kubernetes cluster setup with kubeadm
+- CNI networking (Calico)
+- Helm templating and deployment strategy
+- CI/CD automation with GitHub Actions
+- Real-world DevOps troubleshooting
+- Laravel container optimization
+
+---
+
+## 🔮 Future Improvements
+
+- [ ]  Add MySQL (RDS / StatefulSet)
+- [ ]  Enable Persistent Volumes
+- [ ]  Implement HPA (Auto Scaling)
+- [ ]  Add HTTPS with Cert-Manager
+- [ ]  Monitoring with Prometheus & Grafana
+- [ ]  Implement GitOps with ArgoCD
+
+---
+
+## 📌 Conclusion
+
+This project represents a real production-grade DevOps workflow, where every code push triggers an automated pipeline that builds, tests, and deploys a Laravel application into a Kubernetes cluster.
+
+**It demonstrates strong hands-on experience in:**
+
+- Cloud Infrastructure
+- CI/CD Automation
+- Kubernetes Orchestration
+- Containerized Application Deployment
+
+## **👨‍💻 Author**
+
+ **Md Mazid Hossain**
+
+Contact: 01739365972
