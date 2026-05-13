@@ -1,156 +1,189 @@
-`# 🚀 Laravel on Kubernetes (kubeadm + Docker + Helm + GitHub Actions)
+# 🚀 Laravel on Kubernetes
 
-A production-style end-to-end DevOps project demonstrating deployment of a Laravel 11 application on a self-managed Kubernetes cluster using Docker, Helm, and GitHub Actions CI/CD pipeline.
+### Production-Style DevOps Deployment using Kubernetes, Docker, Helm & GitHub Actions
+
+![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.30-blue?logo=kubernetes)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)
+![Laravel](https://img.shields.io/badge/Laravel-11-red?logo=laravel)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-black?logo=githubactions)
+![Helm](https://img.shields.io/badge/Helm-Charts-0F1689?logo=helm)
+![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws)
 
 ---
 
 ## 📌 Project Overview
-This project demonstrates how a Laravel application can be containerized and deployed on a Kubernetes cluster built using **kubeadm** on **AWS EC2**. The deployment is fully automated using **GitHub Actions CI/CD pipeline** and managed through **Helm charts** with Ingress-based external access.
 
-The system is designed as a real-world DevOps workflow including build, push, deploy, monitoring, and troubleshooting.
+This project demonstrates a complete **end-to-end DevOps workflow** for deploying a **Laravel 11 application** on a self-managed Kubernetes cluster using:
+
+- Docker
+- Kubernetes (kubeadm)
+- Helm
+- GitHub Actions CI/CD
+- AWS EC2
+
+The deployment pipeline is fully automated. Every push to GitHub automatically builds a Docker image, pushes it to Docker Hub, and deploys the latest version into the Kubernetes cluster using Helm.
 
 ---
 
-## 🏗️ Architecture
+# 🏗️ Architecture
+
 ```text
-Developer → GitHub → GitHub Actions CI
-                         ↓
-                 Docker Image Build
-                         ↓
-                    Docker Hub
-                         ↓
-                 GitHub Actions CD
-                         ↓
-                 Helm Deployment
-                         ↓
-              Kubernetes Cluster (kubeadm)
-                         ↓
-        ┌────────────────────────────┐
-        │ Laravel App (PHP + Nginx)  │
-        │ Ingress Controller         │
-        └────────────────────────────┘
-                         ↓
-                 NodePort (30850)
-                         ↓
-                     Browser User`
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions (CI Pipeline)
+    │
+    ├── Docker Build
+    └── Docker Push → Docker Hub
+                          │
+                          ▼
+               GitHub Actions (CD)
+                          │
+                          ▼
+                  Helm Deployment
+                          │
+                          ▼
+          Kubernetes Cluster (kubeadm)
+        ┌──────────────────────────────┐
+        │ Master Node                  │
+        │ Worker Node 1                │
+        │ Worker Node 2                │
+        └──────────────────────────────┘
+                          │
+                          ▼
+               Nginx Ingress Controller
+                          │
+                          ▼
+                 NodePort : 30850
+                          │
+                          ▼
+                     Browser User
 
----
 
-## ⚙️ Tech Stack
 
-| **Layer** | **Technology** |
-| --- | --- |
-| **Application** | Laravel 11 (PHP 8.2-FPM, Nginx) |
-| **Containerization** | Docker (Multi-stage build) |
-| **Orchestration** | Kubernetes (kubeadm v1.30) |
-| **Package Manager** | Helm |
-| **CI/CD** | GitHub Actions |
-| **Cloud** | AWS EC2 (Ubuntu 22.04) |
-| **Networking** | Calico CNI, Nginx Ingress |
-| **Registry** | Docker Hub |
+⚙️ Tech Stack
 
----
+| Category               | Technology                   |
+| ---------------------- | ---------------------------- |
+| Application            | Laravel 11 (PHP 8.2 + Nginx) |
+| Containerization       | Docker (Multi-stage Build)   |
+| Orchestration          | Kubernetes (kubeadm v1.30)   |
+| Package Management     | Helm                         |
+| CI/CD                  | GitHub Actions               |
+| Cloud Platform         | AWS EC2 (Ubuntu 22.04)       |
+| Networking             | Calico CNI + Nginx Ingress   |
+| Container Registry     | Docker Hub                   |
 
-## 🚀 Key Features
 
-- ✅ Fully containerized Laravel application
-- ✅ Production-like Kubernetes cluster setup (1 master + 2 workers)
-- ✅ Automated CI/CD pipeline with GitHub Actions
-- ✅ Helm-based deployment management
-- ✅ Ingress controller for external traffic routing
-- ✅ Health check endpoint (`/health`)
-- ✅ Scalable and modular architecture
+🚀 Key Features
 
----
+✅ Fully Containerized Laravel Application
+✅ Kubernetes Cluster (1 Master + 2 Workers)
+✅ Automated CI/CD Pipeline
+✅ Helm-Based Deployment Strategy
+✅ Nginx Ingress Controller
+✅ Health Check Endpoint (/health)
+✅ Rolling Update Deployment
+✅ Production-Style Infrastructure
+✅ Real-World Troubleshooting Experience
 
-## 🧱 Project Setup Flow
 
-1. Laravel application setup
-2. Docker image creation (multi-stage build)
-3. Push image to Docker Hub
-4. Kubernetes cluster setup using kubeadm
-5. Install Calico CNI & Nginx Ingress Controller
-6. Create Helm chart (Deployment, Service, Ingress, ConfigMap)
-7. Configure GitHub Actions CI/CD pipeline
-8. Deploy application automatically via Helm upgrade
-9. Access application via NodePort + Ingress
+## 🧱 Deployment Workflow
 
----
+  1️⃣ Laravel Application Setup
+        Laravel 11 project initialization
+        Added /health route for Kubernetes health checks
 
-## 🐞 Key Issues & Solutions
+  2️⃣ Dockerization
+        Multi-stage Docker build
+        PHP-FPM + Nginx configuration
+        Non-root user implementation
+        Supervisor process management
 
-| **Issue** | **Cause** | **Solution** |
-| --- | --- | --- |
-| **Nodes NotReady** | Missing CNI | Installed Calico |
-| **Worker Not Joining** | swap enabled | Disabled swap |
-| **Ingress error** | webhook issue | Removed invalid webhook config |
-| **PVC Pending** | No StorageClass | Disabled persistence |
-| **Laravel 500 error** | session DB issue | Set `SESSION_DRIVER=file` |
-| **Supervisord error** | wrong path | Fixed executable path |
-| **Connection refused** | Security group issue | Opened NodePort 30850 |
+  3️⃣ Kubernetes Cluster Setup
+        kubeadm-based cluster initialization
+        Calico CNI installation
+        Worker node configuration
+        Nginx Ingress Controller setup
 
----
+  4️⃣ Helm Deployment
+        Deployment
+        Service
+        Ingress
+        ConfigMap
+        Secret
+        Health probes
 
-## ✅ Final Result
+  5️⃣ CI/CD Automation
 
-- **Pods Status:** Running (1/1)
-- **Health Check:** `{"status":"ok"}`
-- **Browser Access:** `http://laravel-test.local:30850`
-- **CI/CD:** Fully automated deployment on every push
+    GitHub Actions pipeline automatically:
+        Builds Docker image
+        Pushes image to Docker Hub
+        Deploys application using Helm
 
----
+
+🐞 Major Issues & Solutions        
+
+| Issue                      | Cause                         | Solution                              |
+| -------------------------- | ----------------------------- | ------------------------------------- |
+| Nodes showing `NotReady`   | Missing CNI                   | Installed Calico                      |
+| Worker node failed to join | Swap enabled                  | Disabled swap                         |
+| Ingress webhook failure    | Webhook validation issue      | Removed invalid webhook configuration |
+| PVC stuck in Pending       | No StorageClass               | Disabled persistence                  |
+| Laravel session error      | Database session driver issue | Set `SESSION_DRIVER=file            |
+| Supervisor startup failure | Wrong executable path         | Fixed supervisord path                |
+| Application inaccessible   | Security Group issue          | Opened NodePort 30850                 |
+
+
+✅ Final Result
+
+| Component         | Status       |
+| ----------------- | ------------ |
+| Kubernetes Pods   | ✅ Running    |
+| Health Check API  | ✅ Working    |
+| Browser Access    | ✅ Accessible |
+| CI/CD Pipeline    | ✅ Automated  |
+| Docker Deployment | ✅ Successful |
+
 
 ## 📸 Screenshots
 
 #### 1. Kubernetes Cluster Status (Nodes Ready)
-![Cluster Status](./screenshots/nodes_ready.png)
+![Cluster Status](screenshots/nodes_ready.png)
 
 #### 2. Kubernetes Pods Status
-![Pod Status](./screenshots/pod_status.png)
+![Pod Status](screenshots/pod_status.png)
 
 #### 3. Web Browser Access
-![Browser Output](./screenshots/browser_output.png)
+![Browser Output](screenshots/browser_output.png)
 
 #### 4. GitHub Actions Pipeline Success
-![GitHub Actions](./screenshots/pipeline_success.png)
+![GitHub Actions](screenshots/pipeline_success.png)
 
 
-## 🧠 What I Learned
+🧠 What I Learned
 
-- Docker multi-stage production builds
-- Kubernetes cluster setup with kubeadm
-- CNI networking (Calico)
-- Helm templating and deployment strategy
-- CI/CD automation with GitHub Actions
-- Real-world DevOps troubleshooting
-- Laravel container optimization
+        Docker multi-stage image optimization
+        Kubernetes cluster administration
+        kubeadm production-style setup
+        Helm chart templating
+        Kubernetes networking with Calico
+        Ingress configuration
+        GitHub Actions CI/CD automation
+        Real-world DevOps troubleshooting
+        Laravel production deployment practices
 
----
+🔮 Future Improvements
+        MySQL Deployment (RDS / StatefulSet)
+        Persistent Volume Support
+        Horizontal Pod Autoscaler (HPA)
+        HTTPS with Cert-Manager
+        Prometheus & Grafana Monitoring
+        GitOps using ArgoCD
 
-## 🔮 Future Improvements
-
-- [ ]  Add MySQL (RDS / StatefulSet)
-- [ ]  Enable Persistent Volumes
-- [ ]  Implement HPA (Auto Scaling)
-- [ ]  Add HTTPS with Cert-Manager
-- [ ]  Monitoring with Prometheus & Grafana
-- [ ]  Implement GitOps with ArgoCD
-
----
-
-## 📌 Conclusion
-
-This project represents a real production-grade DevOps workflow, where every code push triggers an automated pipeline that builds, tests, and deploys a Laravel application into a Kubernetes cluster.
-
-**It demonstrates strong hands-on experience in:**
-
-- Cloud Infrastructure
-- CI/CD Automation
-- Kubernetes Orchestration
-- Containerized Application Deployment
-
-## **👨‍💻 Author**
-
- **Md Mazid Hossain**
-
-Contact: 01739365972
+👨‍💻 Author
+Md Mazid Hossain
+📧 Contact: 01739365972
