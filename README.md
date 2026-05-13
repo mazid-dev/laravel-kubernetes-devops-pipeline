@@ -149,19 +149,17 @@ GitHub Actions (CI Pipeline)
 | Docker Deployment | ✅ Successful |
 
 
-## 📸 Screenshots
-
 #### 1. Kubernetes Cluster Status (Nodes Ready)
-![Cluster Status](./screenshots/nodes_ready.png)
+![Cluster Status](screenshots/nodes_ready.png)
 
 #### 2. Kubernetes Pods Status
-![Pod Status](./screenshots/pod_status.png)
+![Pod Status](screenshots/pod_status.png)
 
 #### 3. Web Browser Access
-![Browser Output](./screenshots/browser_output.png)
+![Browser Output](screenshots/browser_output.png)
 
 #### 4. GitHub Actions Pipeline Success
-![GitHub Actions](./screenshots/pipeline_success.png)
+![GitHub Actions](screenshots/pipeline_success.png)
 
 
 🧠 What I Learned
